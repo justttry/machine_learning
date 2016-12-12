@@ -96,37 +96,32 @@ def createTree(dataSet, labels):
                                                   (dataSet, bestFeat, value),
                                                   subLabels)
     return myTree
-
-decisionNode = dict(boxstyle='sawtooth', fc='0.8')
-leafNode = dict(boxstyle='round4', fc='0.8')
-arrow_args = dict(arrowstyle='<-')
-
-#----------------------------------------------------------------------
-def plotNode(nodeTxt, centerPt, parentPt, nodeType):
-    """"""
-    createPlot.ax1.annotate(nodeTxt, xy=parentPt,
-                            xycoords='axes fraction',
-                            xytext=centerPt,
-                            textcoords='axes fraction',
-                            va='center',
-                            ha='center',
-                            bbox=nodeTxt,
-                            arrowprops=arrow_args)
     
 #----------------------------------------------------------------------
-def createPlot():
+def classify(inputTree, featLabels, testVec):
     """"""
-    fig = plt.figure(1, facecolor='white')
-    fig.clf()
-    createPlot.ax1 = plt.subplot(111, frameon=False)
-    plotNode('a decision node',
-             (0.5, 0.1),
-             (0.1, 0.5),
-             decisionNode)
-    plotNode('a leaf node',
-             (0.8, 0.1),
-             (0.3, 0.8),
-             leafNode)
-    plt.show()
-    
+    firstStr = inputTree.keys()[0]
+    secondDict = inputTree[firstStr]
+    featIndex = featLabels.index(firstStr)
+    for key in secondDict.keys():
+        if testVec[featIndex] == key:
+            if type(secondDict[key]).__name__=='dict':
+                classLabel = classify(secondDict[key], featLabels, testVec)
+            else:
+                classLabel = secondDict[key]
+    return classLabel
 
+#----------------------------------------------------------------------
+def storeTree(inputTree, filename):
+    """"""
+    import pickle
+    fw = open(filename, 'w')
+    pickle.dump(inputTree, fw)
+    fw.close()
+    
+#----------------------------------------------------------------------
+def grabTree(filename):
+    """"""
+    import pickle
+    fr = open(filename)
+    return pickle.load(fr)
